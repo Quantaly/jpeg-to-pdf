@@ -1,3 +1,24 @@
+#![doc(html_root_url = "https://docs.rs/jpeg-to-pdf/0.1.0")]
+//! Creates PDFs from JPEG images.
+//!
+//! Images are embedded directly in the PDF, without any re-encoding.
+//!
+//! # Example
+//!
+//! ```no_run
+//! use std::fs::{self, File};
+//! use std::io::BufWriter;
+//!
+//! use jpeg_to_pdf::create_pdf_from_jpegs;
+//! 
+//! let one = fs::read("one.jpg").unwrap();
+//! let two = fs::read("two.jpg").unwrap();
+//! let three = fs::read("three.jpg").unwrap();
+//!
+//! let out_file = File::create("out.pdf").unwrap();
+//! create_pdf_from_jpegs(vec![one, two, three], &mut BufWriter::new(out_file), None).unwrap();
+//! ```
+
 use exif::{Field, In, Reader as ExifReader, Tag, Value};
 use jpeg_decoder::{Decoder as JpegDecoder, PixelFormat};
 use ori::Orientation;
@@ -18,6 +39,11 @@ lazy_static! {
     };
 }
 
+/// Creates a PDF file from the provided JPEG data.
+///
+/// PDF data is written to `out`.
+///
+/// `dpi` defaults to `300.0`.
 pub fn create_pdf_from_jpegs(
     jpegs: Vec<Vec<u8>>,
     out: &mut BufWriter<impl Write>,
@@ -99,6 +125,7 @@ fn add_page(image: Vec<u8>, doc: &PdfDocumentReference, dpi: f64) -> Result<(), 
     }
 }
 
+/// An error that might occur while creating a PDF from JPEGs.
 #[derive(Debug)]
 pub struct Error {
     pub index: usize,
@@ -119,6 +146,7 @@ impl Display for Error {
 
 impl std::error::Error for Error {}
 
+/// Things that might go wrong while creating a PDF from JPEGs.
 #[derive(Debug)]
 pub enum Cause {
     ImageInfo(jpeg_decoder::Error),

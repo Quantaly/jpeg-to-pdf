@@ -57,21 +57,26 @@ impl Orientation {
     }
 }
 
-// TODO add tests for the rest of the orientations
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-#[test]
-fn orientation_6() {
-    let (width, height) = (4032, 3024);
-    let ori = Orientation {
-        value: 6,
-        width,
-        height,
-    };
+    // TODO add tests for the other seven orientations
 
-    assert_eq!(ori.display_width(), height);
-    assert_eq!(ori.display_height(), width);
-    assert_eq!(ori.translate_x(), 0);
-    assert_eq!(ori.translate_y(), width);
-    assert_eq!(ori.rotate_cw(), 270.0);
-    assert_eq!(ori.scale_x(), 1.0);
+    #[test]
+    fn orientation_6() {
+        let (width, height) = (4032, 3024);
+        let ori = Orientation {
+            value: 6,
+            width,
+            height,
+        };
+
+        assert_eq!(ori.display_width(), height);
+        assert_eq!(ori.display_height(), width);
+        assert_eq!(ori.translate_x(), 0);
+        assert_eq!(ori.translate_y(), width);
+        assert_eq!(ori.rotate_cw(), 270.0);
+        assert_eq!(ori.scale_x(), 1.0);
+    }
 }
