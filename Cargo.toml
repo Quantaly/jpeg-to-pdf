@@ -1,6 +1,6 @@
 [package]
 name = "jpeg-to-pdf"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Kai Page <kai@quantaly.net>"]
 edition = "2018"
 description = "Create PDFs from JPEG images"
@@ -13,6 +13,7 @@ categories = ["multimedia::images", "command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+img-parts = "0.2"
 jpeg-decoder = "0.1"
 lazy_static = "1.4"
 kamadak-exif = "0.5"
