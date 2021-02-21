@@ -116,7 +116,7 @@ fn add_page(
 
             let ori = match image.exif() {
                 None => 1,
-                Some(exif) => match ExifReader::new().read_raw(exif.into_iter().collect()) {
+                Some(exif) => match ExifReader::new().read_raw(exif.to_vec()) {
                     Err(_) => 1,
                     Ok(exif) => match &exif
                         .get_field(Tag::Orientation, In::PRIMARY)
