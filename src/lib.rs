@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/jpeg-to-pdf/0.2.0")]
+#![doc(html_root_url = "https://docs.rs/jpeg-to-pdf/0.2.1")]
 //! Creates PDFs from JPEG images.
 //!
 //! Images are embedded directly in the PDF, without any re-encoding.
@@ -36,6 +36,8 @@ extern crate lazy_static;
 mod errors;
 mod ori;
 
+mod tests;
+
 lazy_static! {
     static ref DEFAULT_ORIENTATION: Field = Field {
         tag: Tag::Orientation,
@@ -49,6 +51,7 @@ pub struct JpegToPdf {
     images: Vec<Vec<u8>>,
     dpi: f64,
     strip_exif: bool,
+    document_title: String,
 }
 
 impl JpegToPdf {
@@ -57,6 +60,7 @@ impl JpegToPdf {
             images: Vec::new(),
             dpi: 300.0,
             strip_exif: false,
+            document_title: String::new(),
         }
     }
 
@@ -86,8 +90,15 @@ impl JpegToPdf {
         self
     }
 
+    /// Sets the title of the PDF output.
+    pub fn set_document_title(mut self, document_title: impl Into<String>) -> JpegToPdf {
+        self.document_title = document_title.into();
+        self
+    }
+
+    /// Writes the PDF output to `out`.
     pub fn create_pdf(self, out: &mut BufWriter<impl Write>) -> Result<(), Error> {
-        let doc = PdfDocument::empty("");
+        let doc = PdfDocument::empty(self.document_title);
         for (index, image) in self.images.into_iter().enumerate() {
             if let Err(cause) = add_page(image, &doc, self.dpi, self.strip_exif) {
                 return Err(Error { index, cause });
