@@ -1,5 +1,5 @@
-use std::{fs::{self, File}, io::Write};
-use std::io::{self, BufWriter};
+use std::fs::{self, File};
+use std::io::{self, prelude::*, BufWriter};
 use std::path::PathBuf;
 use std::process;
 
@@ -8,7 +8,7 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 struct Opt {
-    /// By default, uses the same name as the first input with a ".pdf" extension
+    /// By default, uses the same name as the first input, with the extension changed to ".pdf"
     #[structopt(short, long, parse(from_os_str))]
     output: Option<PathBuf>,
 
@@ -21,6 +21,10 @@ struct Opt {
     /// Strip EXIF metadata from the embedded images
     #[structopt(long)]
     strip_exif: bool,
+
+    /// Add a title to the generated PDF
+    #[structopt(long)]
+    title: Option<String>,
 }
 
 fn main() -> io::Result<()> {
@@ -45,7 +49,10 @@ fn main() -> io::Result<()> {
         // have to do this with a for loop instead of job.add_images() to use the ? error-handling operator
         job = job.add_image(fs::read(image)?);
     }
-    job = job.set_dpi(opt.dpi).strip_exif(opt.strip_exif);
+    job = job
+        .set_dpi(opt.dpi)
+        .strip_exif(opt.strip_exif)
+        .set_document_title(opt.title.unwrap_or_else(String::new));
 
     let mut out = BufWriter::new(out_file);
     if let Err(e) = job.create_pdf(&mut out) {

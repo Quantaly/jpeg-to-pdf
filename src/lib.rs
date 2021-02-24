@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/jpeg-to-pdf/0.2.1")]
+#![doc(html_root_url = "https://docs.rs/jpeg-to-pdf/0.2.2")]
 //! Creates PDFs from JPEG images.
 //!
 //! Images are embedded directly in the PDF, without any re-encoding.
