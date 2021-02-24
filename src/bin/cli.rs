@@ -1,4 +1,4 @@
-use std::fs::{self, File};
+use std::{fs::{self, File}, io::Write};
 use std::io::{self, BufWriter};
 use std::path::PathBuf;
 use std::process;
@@ -42,13 +42,16 @@ fn main() -> io::Result<()> {
 
     let mut job = JpegToPdf::new();
     for image in opt.images {
+        // have to do this with a for loop instead of job.add_images() to use the ? error-handling operator
         job = job.add_image(fs::read(image)?);
     }
     job = job.set_dpi(opt.dpi).strip_exif(opt.strip_exif);
 
-    if let Err(e) = job.create_pdf(&mut BufWriter::new(out_file)) {
+    let mut out = BufWriter::new(out_file);
+    if let Err(e) = job.create_pdf(&mut out) {
         eprintln!("{}", e);
         process::exit(-1);
     }
+    out.flush()?;
     Ok(())
 }
