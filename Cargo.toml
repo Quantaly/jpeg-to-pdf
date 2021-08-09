@@ -10,6 +10,10 @@ license = "MIT OR Apache-2.0"
 keywords = ["jpeg", "jpg", "pdf"]
 categories = ["multimedia::images", "command-line-utilities"]
 
+[[bin]]
+name = "jpeg-to-pdf"
+path = "src/bin/cli.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
