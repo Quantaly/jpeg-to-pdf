@@ -125,20 +125,14 @@ fn add_page(
         Some(info) => {
             let mut image = Jpeg::from_bytes(image.into())?;
 
-            let ori = match image.exif() {
-                None => 1,
-                Some(exif) => match ExifReader::new().read_raw(exif.to_vec()) {
-                    Err(_) => 1,
-                    Ok(exif) => match &exif
-                        .get_field(Tag::Orientation, In::PRIMARY)
-                        .unwrap_or(&DEFAULT_ORIENTATION)
-                        .value
-                    {
-                        Value::Short(v) => *v.first().unwrap_or(&1),
-                        _ => 1,
-                    },
-                },
-            };
+            let ori = image
+                .exif()
+                .and_then(|exif_data| ExifReader::new().read_raw(exif_data.to_vec()).ok())
+                .and_then(|exif| {
+                    exif.get_field(Tag::Orientation, In::PRIMARY)
+                        .and_then(|field| field.value.get_uint(0))
+                })
+                .unwrap_or(1);
 
             let ori = Orientation {
                 value: ori,

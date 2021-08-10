@@ -1,6 +1,6 @@
 #[derive(Debug, Clone, Copy)]
 pub struct Orientation {
-    pub value: u16,
+    pub value: u32,
     pub width: u16,
     pub height: u16,
 }
@@ -69,7 +69,7 @@ mod tests {
         scale_x: f64,
     }
 
-    fn test_orientation(value: u16, expected: fn(width: u16, height: u16) -> OrientationData) {
+    fn test_orientation(value: u32, expected: fn(width: u16, height: u16) -> OrientationData) {
         let (width, height) = (4032, 3024);
 
         let ori = Orientation {
