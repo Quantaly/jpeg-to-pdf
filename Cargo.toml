@@ -1,6 +1,6 @@
 [package]
 name = "jpeg-to-pdf"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Kai Page <kai@quantaly.net>"]
 edition = "2018"
 description = "Create PDFs from JPEG images"
