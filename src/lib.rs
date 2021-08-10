@@ -121,7 +121,7 @@ fn add_page(
     decoder.read_info()?;
 
     match decoder.info() {
-        None => Err(Cause::UnexpectedImageInfo),
+        None => Err(Cause::UnexpectedImageInfo), // decoder.read_info would return Err, so we should never see this
         Some(info) => {
             let mut image = Jpeg::from_bytes(image.into())?;
 
@@ -136,8 +136,8 @@ fn add_page(
 
             let ori = Orientation {
                 value: ori,
-                width: info.width,
-                height: info.height,
+                width: info.width as usize,
+                height: info.height as usize,
             };
 
             if strip_exif {
@@ -148,8 +148,8 @@ fn add_page(
             image.encoder().write_to(&mut image_data).unwrap();
 
             let (page, layer) = doc.add_page(
-                Px(ori.display_width() as usize).into_pt(dpi).into(),
-                Px(ori.display_height() as usize).into_pt(dpi).into(),
+                Px(ori.display_width()).into_pt(dpi).into(),
+                Px(ori.display_height()).into_pt(dpi).into(),
                 "",
             );
 
@@ -170,10 +170,10 @@ fn add_page(
 
             image.add_to_layer(
                 doc.get_page(page).get_layer(layer),
-                Some(Px(ori.translate_x() as usize).into_pt(dpi).into()),
-                Some(Px(ori.translate_y() as usize).into_pt(dpi).into()),
-                Some(ori.rotate_cw()),
-                Some(ori.scale_x()),
+                ori.translate_x().map(|px| Px(px).into_pt(dpi).into()),
+                ori.translate_y().map(|px| Px(px).into_pt(dpi).into()),
+                ori.rotate_cw(),
+                ori.scale_x(),
                 None,
                 Some(dpi),
             );

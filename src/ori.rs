@@ -1,56 +1,56 @@
 #[derive(Debug, Clone, Copy)]
 pub struct Orientation {
     pub value: u32,
-    pub width: u16,
-    pub height: u16,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl Orientation {
-    pub fn display_width(self) -> u16 {
+    pub fn display_width(self) -> usize {
         match self.value {
             5..=8 => self.height,
             _ => self.width,
         }
     }
 
-    pub fn display_height(self) -> u16 {
+    pub fn display_height(self) -> usize {
         match self.value {
             5..=8 => self.width,
             _ => self.height,
         }
     }
 
-    pub fn translate_x(self) -> u16 {
+    pub fn translate_x(self) -> Option<usize> {
         match self.value {
-            2 | 3 => self.width,
-            5 | 8 => self.height,
-            _ => 0,
+            2 | 3 => Some(self.width),
+            5 | 8 => Some(self.height),
+            _ => None,
         }
     }
 
-    pub fn translate_y(self) -> u16 {
+    pub fn translate_y(self) -> Option<usize> {
         match self.value {
-            3 | 4 => self.height,
-            5 | 6 => self.width,
-            _ => 0,
+            3 | 4 => Some(self.height),
+            5 | 6 => Some(self.width),
+            _ => None,
         }
     }
 
     // based on testing, it seems like this is actually counterclockwise
     // but printpdf still calls it `rotate_cw`
-    pub fn rotate_cw(self) -> f64 {
+    pub fn rotate_cw(self) -> Option<f64> {
         match self.value {
-            3 | 4 => 180.0,
-            5 | 8 => 90.0,
-            6 | 7 => 270.0,
-            _ => 0.0,
+            3 | 4 => Some(180.0),
+            5 | 8 => Some(90.0),
+            6 | 7 => Some(270.0),
+            _ => None,
         }
     }
 
-    pub fn scale_x(self) -> f64 {
+    pub fn scale_x(self) -> Option<f64> {
         match self.value {
-            2 | 4 | 5 | 7 => -1.0,
-            _ => 1.0,
+            2 | 4 | 5 | 7 => Some(-1.0),
+            _ => None,
         }
     }
 }
@@ -61,15 +61,15 @@ mod tests {
 
     #[derive(Debug, PartialEq)]
     struct OrientationData {
-        display_width: u16,
-        display_height: u16,
-        translate_x: u16,
-        translate_y: u16,
-        rotate_cw: f64,
-        scale_x: f64,
+        display_width: usize,
+        display_height: usize,
+        translate_x: Option<usize>,
+        translate_y: Option<usize>,
+        rotate_cw: Option<f64>,
+        scale_x: Option<f64>,
     }
 
-    fn test_orientation(value: u32, expected: fn(width: u16, height: u16) -> OrientationData) {
+    fn test_orientation(value: u32, expected: fn(width: usize, height: usize) -> OrientationData) {
         let (width, height) = (4032, 3024);
 
         let ori = Orientation {
@@ -96,10 +96,10 @@ mod tests {
         test_orientation(1, |width, height| OrientationData {
             display_width: width,
             display_height: height,
-            translate_x: 0,
-            translate_y: 0,
-            rotate_cw: 0.0,
-            scale_x: 1.0,
+            translate_x: None,
+            translate_y: None,
+            rotate_cw: None,
+            scale_x: None,
         });
     }
 
@@ -108,10 +108,10 @@ mod tests {
         test_orientation(2, |width, height| OrientationData {
             display_width: width,
             display_height: height,
-            translate_x: width,
-            translate_y: 0,
-            rotate_cw: 0.0,
-            scale_x: -1.0,
+            translate_x: Some(width),
+            translate_y: None,
+            rotate_cw: None,
+            scale_x: Some(-1.0),
         });
     }
 
@@ -120,10 +120,10 @@ mod tests {
         test_orientation(3, |width, height| OrientationData {
             display_width: width,
             display_height: height,
-            translate_x: width,
-            translate_y: height,
-            rotate_cw: 180.0,
-            scale_x: 1.0,
+            translate_x: Some(width),
+            translate_y: Some(height),
+            rotate_cw: Some(180.0),
+            scale_x: None,
         });
     }
 
@@ -132,10 +132,10 @@ mod tests {
         test_orientation(4, |width, height| OrientationData {
             display_width: width,
             display_height: height,
-            translate_x: 0,
-            translate_y: height,
-            rotate_cw: 180.0,
-            scale_x: -1.0,
+            translate_x: None,
+            translate_y: Some(height),
+            rotate_cw: Some(180.0),
+            scale_x: Some(-1.0),
         });
     }
 
@@ -144,10 +144,10 @@ mod tests {
         test_orientation(5, |width, height| OrientationData {
             display_width: height,
             display_height: width,
-            translate_x: height,
-            translate_y: width,
-            rotate_cw: 90.0,
-            scale_x: -1.0,
+            translate_x: Some(height),
+            translate_y: Some(width),
+            rotate_cw: Some(90.0),
+            scale_x: Some(-1.0),
         });
     }
 
@@ -156,10 +156,10 @@ mod tests {
         test_orientation(6, |width, height| OrientationData {
             display_width: height,
             display_height: width,
-            translate_x: 0,
-            translate_y: width,
-            rotate_cw: 270.0,
-            scale_x: 1.0,
+            translate_x: None,
+            translate_y: Some(width),
+            rotate_cw: Some(270.0),
+            scale_x: None,
         });
     }
 
@@ -168,10 +168,10 @@ mod tests {
         test_orientation(7, |width, height| OrientationData {
             display_width: height,
             display_height: width,
-            translate_x: 0,
-            translate_y: 0,
-            rotate_cw: 270.0,
-            scale_x: -1.0,
+            translate_x: None,
+            translate_y: None,
+            rotate_cw: Some(270.0),
+            scale_x: Some(-1.0),
         });
     }
 
@@ -180,10 +180,10 @@ mod tests {
         test_orientation(8, |width, height| OrientationData {
             display_width: height,
             display_height: width,
-            translate_x: height,
-            translate_y: 0,
-            rotate_cw: 90.0,
-            scale_x: 1.0,
+            translate_x: Some(height),
+            translate_y: None,
+            rotate_cw: Some(90.0),
+            scale_x: None,
         });
     }
 }
