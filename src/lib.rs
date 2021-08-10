@@ -98,16 +98,21 @@ impl JpegToPdf {
 
     /// Writes the PDF output to `out`.
     pub fn create_pdf(self, out: &mut BufWriter<impl Write>) -> Result<(), Error> {
+        let (dpi, strip_exif) = (self.dpi, self.strip_exif);
+
         let doc = PdfDocument::empty(self.document_title);
-        for (index, image) in self.images.into_iter().enumerate() {
-            if let Err(cause) = add_page(image, &doc, self.dpi, self.strip_exif) {
-                return Err(Error { index, cause });
-            }
-        }
-        doc.save(out).map_err(|e| Error {
-            index: 0,
-            cause: Cause::PdfWrite(e),
-        })
+        self.images
+            .into_iter()
+            .enumerate()
+            .try_for_each(|(index, image)| {
+                add_page(image, &doc, dpi, strip_exif).map_err(|cause| Error { index, cause })
+            })
+            .and_then(|()| {
+                doc.save(out).map_err(|e| Error {
+                    index: 0,
+                    cause: Cause::PdfWrite(e),
+                })
+            })
     }
 }
 
