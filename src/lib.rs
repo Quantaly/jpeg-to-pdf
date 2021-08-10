@@ -23,29 +23,17 @@
 
 use errors::Error;
 pub use errors::*;
-use exif::{Field, In, Reader as ExifReader, Tag, Value};
+use exif::{In, Reader as ExifReader, Tag};
 use img_parts::{jpeg::Jpeg, ImageEXIF};
 use jpeg_decoder::{Decoder as JpegDecoder, PixelFormat};
 use ori::Orientation;
 use printpdf::*;
 use std::io::{prelude::*, BufWriter, Cursor};
 
-#[macro_use]
-extern crate lazy_static;
-
 mod errors;
 mod ori;
 
 mod tests;
-
-lazy_static! {
-    static ref DEFAULT_ORIENTATION: Field = Field {
-        tag: Tag::Orientation,
-        ifd_num: In::PRIMARY,
-        value: Value::Short(vec![1]),
-    };
-}
-
 /// Creates a PDF from JPEG images.
 pub struct JpegToPdf {
     images: Vec<Vec<u8>>,

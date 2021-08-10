@@ -19,7 +19,6 @@ path = "src/bin/cli.rs"
 [dependencies]
 img-parts = "0.2"
 jpeg-decoder = "0.1"
-lazy_static = "1.4"
 kamadak-exif = "0.5"
 printpdf = "0.3"
 structopt = "0.3"

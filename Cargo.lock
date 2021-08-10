@@ -375,7 +375,6 @@ dependencies = [
  "img-parts",
  "jpeg-decoder",
  "kamadak-exif",
- "lazy_static",
  "printpdf",
  "structopt",
  "version-sync",
