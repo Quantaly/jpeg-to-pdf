@@ -126,22 +126,11 @@ fn add_page(
             let mut image = Jpeg::from_bytes(image.into())?;
 
             let ori = match image.exif() {
-                None => {
-                    eprintln!("image has no metadata");
-                    1
-                },
+                None => 1,
                 Some(exif) => match ExifReader::new().read_raw(exif.to_vec()) {
                     Err(_) => 1,
                     Ok(exif) => match &exif
                         .get_field(Tag::Orientation, In::PRIMARY)
-                        .filter(|t| {
-                            eprintln!("image orientation is {}", t.display_value());
-                            true
-                        })
-                        .or_else(|| {
-                            eprintln!("image has no orientation");
-                            None
-                        })
                         .unwrap_or(&DEFAULT_ORIENTATION)
                         .value
                     {

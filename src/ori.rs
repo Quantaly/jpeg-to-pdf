@@ -7,38 +7,31 @@ pub struct Orientation {
 
 impl Orientation {
     pub fn display_width(self) -> u16 {
-        if self.value > 4 {
-            self.height
-        } else {
-            self.width
+        match self.value {
+            5..=8 => self.height,
+            _ => self.width,
         }
     }
 
     pub fn display_height(self) -> u16 {
-        if self.value > 4 {
-            self.width
-        } else {
-            self.height
+        match self.value {
+            5..=8 => self.width,
+            _ => self.height,
         }
     }
 
     pub fn translate_x(self) -> u16 {
         match self.value {
-            2 => self.width,
-            7 => 0,
-            4 => 0,
-            3..=4 => self.width,
-            5 => self.height,
-            7..=8 => self.height,
+            2 | 3 => self.width,
+            5 | 8 => self.height,
             _ => 0,
         }
     }
 
     pub fn translate_y(self) -> u16 {
         match self.value {
-            5 => self.width,
-            3..=4 => self.height,
-            5..=6 => self.width,
+            3 | 4 => self.height,
+            5 | 6 => self.width,
             _ => 0,
         }
     }
@@ -47,19 +40,15 @@ impl Orientation {
     // but printpdf still calls it `rotate_cw`
     pub fn rotate_cw(self) -> f64 {
         match self.value {
-            5 => 90.0,
-            7 => 270.0,
-            5..=6 => 270.0,
-            3..=4 => 180.0,
-            7..=8 => 90.0,
+            3 | 4 => 180.0,
+            5 | 8 => 90.0,
+            6 | 7 => 270.0,
             _ => 0.0,
         }
     }
 
     pub fn scale_x(self) -> f64 {
         match self.value {
-            5 => -1.0,
-            7 => -1.0,
             2 | 4 | 5 | 7 => -1.0,
             _ => 1.0,
         }
