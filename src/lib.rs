@@ -40,6 +40,8 @@ pub struct JpegToPdf {
     dpi: f64,
     strip_exif: bool,
     document_title: String,
+    creation_date: OffsetDateTime,
+    mod_date: OffsetDateTime,
 }
 
 impl JpegToPdf {
@@ -49,6 +51,8 @@ impl JpegToPdf {
             dpi: 300.0,
             strip_exif: false,
             document_title: String::new(),
+            creation_date: OffsetDateTime::now_utc(),
+            mod_date: OffsetDateTime::now_utc(),
         }
     }
 
@@ -84,11 +88,26 @@ impl JpegToPdf {
         self
     }
 
+    /// Sets the creation date of the PDF output.
+    pub fn set_creation_date(mut self, creation_date: OffsetDateTime) -> JpegToPdf {
+        self.creation_date = creation_date;
+        self
+    }
+
+    /// Sets the modification date of the PDF output.
+    pub fn set_mod_date(mut self, mod_date: OffsetDateTime) -> JpegToPdf {
+        self.mod_date = mod_date;
+        self
+    }
+
     /// Writes the PDF output to `out`.
     pub fn create_pdf(self, out: &mut BufWriter<impl Write>) -> Result<(), Error> {
         let (dpi, strip_exif) = (self.dpi, self.strip_exif);
 
-        let doc = PdfDocument::empty(self.document_title);
+        let doc = PdfDocument::empty(self.document_title)
+            .with_creation_date(self.creation_date)
+            .with_mod_date(self.mod_date);
+
         self.images
             .into_iter()
             .enumerate()
